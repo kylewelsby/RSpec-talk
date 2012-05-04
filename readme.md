@@ -1,5 +1,5 @@
 # RSpec
 ### The less liked parts
 
-[View the presentation](https://kylewelsby.github.com/RSpec-talk)
+[View the presentation](http://kylewelsby.github.com/RSpec-talk)
 
