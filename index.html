@@ -1,0 +1,331 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>RSpec the less liked parts</title>
+    <script src="http://html5slides.googlecode.com/svn/trunk/slides.js"></script>
+    <style type='text/css'>
+      .slides.template-rspec > article:not(.nobackground):not(.biglogo){
+        background: white url('http://f.cl.ly/items/3r1s232C0o151u09451h/Screen%20Shot%202012-05-04%20at%2013.40.07.png') no-repeat right bottom;
+      }
+    </style>
+  </head>
+  <body style='display: none'>
+    <section class='slides layout-default template-rspec'>
+    <article>
+    <h1>RSpec</h1>
+    <p>The less liked parts</p>
+    <small>Kyle Welsby - @halfcube</small>
+    </article>
+    <article>
+    <h3>RSpec Rails</h3>
+    <ul>
+      <li class='to-build'>Controller Specs ✔</li>
+      <li class='to-build'>Helper Specs ✔</li>
+      <li class='to-build'>Model Specs ✔</li>
+      <li class='to-build'>Mailer Specs ~</li>
+      <li class='to-build'>Routing Specs ?</li>
+      <li class='to-build'>View Specs ?</li>
+    </ul>
+    </article>
+    <article>
+    <img src='http://cdn.memegenerator.net/instances/400x/9869549.jpg' alt='TEST - ALL THE THINGS' class='centered'/>
+    </article>
+    <!--<article>-->
+    <!--<img src='http://assets.diylol.com/hfs/d5d/591/54e/resized/but-why-meme-generator-but-why-e7b637.jpg' alt="!? - BUT WHY?" class='centered'/>-->
+    <!--</article>-->
+    <article>
+    <h1>Routing specs<span class='to-build'>, but why?</span></h1>
+    <p class='to-build'>Confidence when changing routing agreements.</p>
+    </article>
+    <article>
+    <h3>Routing spec</h3>
+    <p>Get carparks for a basket resource.</p>
+      <pre>GET http://onthebeach.co.uk/basket/:id/carparks</pre>
+    </article>
+    <article>
+    <h3>routes.rb</h3>
+      <pre>map.connect ':controller/:action/:id(.:format)'</pre>
+    <p class='to-build'>Are we sure our route is going to work?</p>
+    </article>
+    <article class='nobackground'>
+    <img src='http://f.cl.ly/items/203q18021v400E2C0g3j/Screen%20Shot%202012-05-03%20at%2015.53.48.png' alt="404">
+    </article>
+    <article>
+    <h1 align='center'>Nope.</h1>
+    </article>
+    <article>
+    <h1 align='center'>TDD</h1>
+    <ul>
+      <li class='to-build'>don't like restarting server</li>
+      <li class='to-build'>don't like switching windows</li>
+      <li class='to-build'>let code test my code</li>
+    </ul>
+    </article>
+    <article>
+      <h3>spec/routing/basket_carparks_routing_spec.rb</h3>
+      <pre>require 'spec_helper'
+      
+describe 'routes for Basket Carpaks' do
+  it {
+    {:get => '/basket/1/carparks'}.
+      should route_to(
+        :controller => 'basket/carparks',
+        :action => 'show',
+        :basket_id => '1'
+      )
+  }
+end</pre>
+    </article>
+    <article>
+      <h3>config/routing.rb</h3>
+      <pre>... # Rails 2
+map.resources :basket do |basket|
+  basket.resource :carparks,
+    :controller => 'basket/carparks'
+end
+...</pre>
+       <pre>... # Rails 3
+resources :basket do
+  resource :carparks, :controller => 'basket/carparks'
+end
+...</pre>
+      </article>
+      <article>
+        <h3>Routing Spec</h3>
+        <ul>
+          <li class='to-build'>Quickly added a routing contract</li>
+          <li class='to-build'>Code confidence that my routes are as expected</li>
+          <li class='to-build'>Ensures complex routes work</li>
+        </ul>
+      </article>
+      <article>
+        <h1>View Specs<span class='to-build'>, but why?</span></h1>
+        <ul>
+          <li class='to-build'>Confidence of response agreements</li>
+          <li class='to-build'>Ensures any view logic works</li>
+          <li class='to-build'>Tests the hard to reach areas</li>
+          <li class='to-build'>Don't like testing everything but the view to test the view.</li>
+          <li class='to-build'>Wasteful browser refreshes</li>
+        </ul>
+      </article>
+      <article>
+        <h3>What we currently do (HTML)</h3>
+        app/controllers/basket/carparks_controller.rb
+        <pre>...
+def show
+  @carparks = @basket.available_carparks
+end
+...</pre>
+        app/views/basket/carparks/show.html.erb
+        <pre>...
+&lt;% @carparks.each do |carpark| %&gt;
+  &lt;div class='carpark'&gt;
+    &lt;%= carpark.name %&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;
+...</pre>
+      </article>
+      <article class='nobackground'>
+        <img src="http://f.cl.ly/items/2W3t0S3G0P3h0A0f3e18/Screen%20Shot%202012-05-04%20at%2011.16.45.png" alt="Eyeball HTML" class="centered"/>
+      </article>
+      <article>
+        <h3>What we currently do (JSON)</h3>
+        <pre>...
+def show
+  @carparks = @basket.available_carparks
+  render :json => @carparks
+end
+...</pre>
+      </article>
+      <article class='nobackground'>
+        <img src='http://f.cl.ly/items/3U0F1L3I052f0r3X073R/Screen%20Shot%202012-05-04%20at%2011.17.18.png' alt="Eyeball JSON" class='centered'/>
+      </article>
+      
+      <article>
+        <img src='http://cdn.memegenerator.net/instances/400x/19946721.jpg' class='centered'/>
+      </article>
+      
+      <article>
+        <h1 align='center'>Let the code do the talking!</h1>
+      </article>
+      
+      <article>
+        <h3>Basket::CarparksController</h3>
+        <pre>... #Rails2
+def show
+  @carparks = @basket.available_carparks
+end
+...</pre>
+        <pre>... #Rails3
+respond_to :json, :html
+
+def show
+  @carparks = @basket.available_carparks
+  respond_with @carparks
+end
+...</pre>
+      </article>
+      
+      <article>
+      <h3>spec/view/basket/carparks/show.html.erb (RSpec 1)</h3>
+        <pre>
+# RSpec 1
+require 'spec_helper'
+
+describe "basket/carparks/show.html.erb" do
+  let(:carpark) {stub(:carpark, :name => "NPC Manchester")}
+  
+  before do
+    assigns[:carparks] = [carpark]
+  end
+  
+  it "renders carpark name" do
+    <span class='to-build'>render</span>
+    <span class='to-build'>response.body.should include "NPC Manchester"</span>
+  end
+end</pre>
+      </article>
+      <article>
+      <h3>spec/view/basket/carparks/show.html.erb (RSpec 2)</h3>
+        <pre>
+# RSpec 2
+require 'spec_helper'
+
+describe "basket/carparks/show.html.erb" do
+  let(:carpark) {stub(:carpark, :name => "NPC Manchester")}
+  
+  before do
+    assign(:carparks, [carpark]) # &lt;= Changed
+  end
+  
+  it "renders carpark name" do
+    render
+    rendered.should include "NPC Manchester" # &lt;= Changed
+  end
+end</pre>
+      </article>
+      
+      <article>
+        <h3>spec/view/basket/carparks/show.json.erb (RSpec 1)</h3>
+        <pre>
+# RSpec 1
+require 'spec_helper'
+
+describe 'basket/carparks/show.html.erb' do
+  let(:carpark) {stub(:carpark, :name => "NPC Manchester")}
+  
+  before do
+    assigns[:carparks] = [carpark]
+    render
+  end 
+  
+  <span class='to-build'>subject {JSON.parse(response.body)}</span>
+  <span class='to-build'>it {subject.should be_a Array}</span>
+  <span class='to-build'>it {subject.first['name'].should eql 'NPC Manchester'}</span>
+end
+        </pre>
+      </article>
+
+      <article>
+        <h3>spec/view/basket/carparks/show.json.erb (RSpec 2)</h3>
+        <pre>
+# RSpec 2
+require 'spec_helper'
+
+describe 'basket/carparks/show.html.erb' do
+  let(:carpark) {stub(:carpark, :name => "NPC Manchester")}
+  
+  before do
+    assign(:carparks, [carpark]) # &lt;= Changed
+    render
+  end
+  
+  subject {JSON.parse(rendered)} # &lt;= Changed
+  it {subject.should be_a Array}
+  it {subject.first['name'].should eql 'NPC Manchester'}
+end
+        </pre>
+      </article>
+      <article>
+        <h3>You still say why?</h3>
+        <ul>
+          <li class='to-build'>Separation of concerns</li>
+          <li class='to-build'>Better confidence for API responses</li>
+          <li class='to-build'>No dependancy on <strong class='to-build'>controllers</strong><strong class='to-build'>, models</strong><strong class='to-build'>, browsers, etc...</strong></li>
+        </ul>
+      </article>
+      <article>
+        <h1 align='center'>Bonus</h1>
+      </article>
+      <article>
+        <h1>Guard</h1>
+        <p>Automatically run your specs</p>
+      </article>
+      <article>
+        <h3>Installation</h3>
+        <pre>...
+group :development, :test do
+  gem 'guard-rspec'
+end
+...</pre>
+      <pre>$ bundle install
+$ guard init rspec
+$ bundle exec guard</pre>
+      </article>
+
+      <article>
+        <h1>RSpec API Documentation</h1>
+        <p>Automatically generate API documentation from RSpec</p>
+        <small>for RSpec 2.6+</small>
+      </article>
+      <article>
+        <h3>Installation</h3>
+        <pre>...
+group :development, :test do
+  gem 'rspec_api_documentation'
+end
+...</pre>
+<pre>$ bundle install</pre>
+      </article>
+      
+      <article>
+        <h3>spec/acceptance/basket/carparks_spec.rb</h3>
+        <pre>require 'spec_helper'
+resource 'Basket/Carparks' do
+  <span class='to-build'>let(:basket) { FactoryGirl(:basket) }</span>
+  get '/basket/:basket_id/carparks' do
+    <span class='to-build'>let(:basket_id) { basket.id }</span>
+    
+    <span class='to-build'>parameter :basket_id, "Customer Basket ID"</span>
+    <span class='to-build'>required_parameters :basket_id</span>
+    <span class='to-build'>
+    example_request "Get Available carparks for a basket" do
+      status.should == 200
+    end</span>
+  end
+end        
+</pre>
+      </article>
+      <article class='nobackground'>
+        <img src='http://f.cl.ly/items/2j1y1X3M0y0w2F1y1917/Screen%20Shot%202012-05-04%20at%2013.36.16.png' alt='API Response' class='centered'/>
+      </article>
+      
+      <article>
+        <h3>Pro Tip</h3>
+        <pre>guard 'rspec',
+  :notification => false,
+  :version => 2,
+  :cli => '--colour', :run_all => {
+    :cli => '--format RspecApiDocumentation::ApiFormatter --colour'
+  } do
+...
+        </pre>
+      </article>
+      <article>
+        <h2>Thank you</h2>
+        <p></p>
+      </article>
+    </section>
+  </body>
+</html>
